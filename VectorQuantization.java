@@ -84,6 +84,7 @@ class VectorQuantization{
         int hightStep;
         int maxNumberOfWidthSteps = imageWidth/blockWidth;
         int maxNumberOfHightSteps = imageHight/blockHight;
+        double[]  frequency = new double[numberOfBlocksInCodeBook];
         while (numberOfBlocksInCodeBook < codeBookSize) {
             //------------
             //2.1-split
@@ -94,7 +95,7 @@ class VectorQuantization{
             //2.2-set blocks to codeBookBlocks
             //---------------------------------
             double [][][] averageArray = new double[numberOfBlocksInCodeBook][blockWidth][blockHight];
-            double[]  frequency = new double[numberOfBlocksInCodeBook];
+            frequency = new double[numberOfBlocksInCodeBook];
             widthStep = 0;
             hightStep = 0;
             while (widthStep < maxNumberOfWidthSteps) {
@@ -139,16 +140,6 @@ class VectorQuantization{
                     }
                 }
             }
-            // for(int n = 0 ; n < this.numberOfBlocksInCodeBook ; n++){
-            //     for(int i = 0 ; i < this.blockWidth ; i++){
-            //         for(int j = 0 ; j < this.blockHight ; j++){
-            //             System.out.print(codeBook[n][i][j]+" ");
-            //         }
-            //         System.out.println();
-            //         System.out.println();
-            //     }
-            //     System.out.println("_____________________________________________");
-            // }
             codeBook = averageArray;
         }
         // for(int n = 0 ; n < this.numberOfBlocksInCodeBook ; n++){
@@ -161,6 +152,58 @@ class VectorQuantization{
         //     }
         //     System.out.println("++++++++++++++++++++++++++++++++++++++++++");
         // }
+        //---------------------------
+        //3-check if there changes
+        //---------------------------
+        boolean thereAreChanges = true;
+        while (thereAreChanges) { 
+            // System.out.println("///////////");
+            thereAreChanges = false;
+            double [][][] averageArray = new double[numberOfBlocksInCodeBook][blockWidth][blockHight];
+            double[]  newFrequency = new double[numberOfBlocksInCodeBook];
+            widthStep = 0;
+            hightStep = 0;
+            while (widthStep < maxNumberOfWidthSteps) {
+                hightStep = 0;
+                while (hightStep < maxNumberOfHightSteps) {
+                    double minDistance=0;
+                    int minBlockDistanceIndex = 0;
+                    for(int i = 0 ; i < numberOfBlocksInCodeBook ; i++ ){
+                        double distance = distance(pixelsArray,widthStep,hightStep,codeBook,i);
+                        if(i == 0){
+                            minDistance = distance;
+                        }
+                        else if(distance < minDistance){
+                            minDistance = distance;
+                            minBlockDistanceIndex = i;
+                        }
+                    }
+                    for(int i = 0; i < blockWidth ; i++){
+                        for(int j = 0 ; j < blockHight ; j++){
+                            averageArray[minBlockDistanceIndex][i][j] +=pixelsArray[(i%blockWidth)+(blockWidth*widthStep)][(j%blockHight)+(blockHight*hightStep)] ;
+                        }
+                    }
+                    newFrequency[minBlockDistanceIndex]++;
+                   // System.out.println("//////////////////////////////////////////////////////////////");
+                    hightStep ++;
+                }
+                widthStep ++;
+            }
+            for(int n = 0 ; n < this.numberOfBlocksInCodeBook ; n++){
+                if(newFrequency[n] != frequency[n]){
+                    // System.out.println( frequency[n] +" "+newFrequency[n] );
+                    thereAreChanges = true;
+                }
+                for(int i = 0 ; i < this.blockWidth ; i++){
+                    for(int j = 0 ; j < this.blockHight ; j++){
+                        averageArray[n][i][j] /= newFrequency[n];
+                    }
+
+                }
+            }
+            frequency = newFrequency;
+            codeBook = averageArray;
+        }
         return codeBook;
 
     }
