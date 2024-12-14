@@ -7,6 +7,7 @@ class VectorQuantization{
     private int blockWidth;
     private int codeBookSize;
     private int numberOfBlocksInCodeBook = 0;
+//_______________________________________________________________________________________________________________________
     private double[][][] split(double[][][] oldCodeBook){
         double[][][] newCodeBook = new double[numberOfBlocksInCodeBook*2][blockWidth][blockHight];
         for(int n = 0 ; n < this.numberOfBlocksInCodeBook ; n++){
@@ -17,27 +18,40 @@ class VectorQuantization{
                 }
             }
         }
+        // for(int n = 0 ; n < this.numberOfBlocksInCodeBook *2; n++){
+        //     for(int i = 0 ; i < this.blockWidth ; i++){
+        //         for(int j = 0 ; j < this.blockHight ; j++){
+        //             System.out.print(newCodeBook[n][i][j]+" ");
+        //         }
+        //         System.out.println();
+        //         System.out.println();
+        //     }
+        //     System.out.println("_____________________________________________");
+        // }
+        // System.out.println("_____________________*________________________");
         return newCodeBook;
     }
+//_____________________________________________________________________________________________________________________________________
     private double distance(int[][] pixelsArray , int widthStep , int hightStep,double[][][] codeBook ,int codeBookIndex){
         double distance = 0;
-        for(int i = 0; i < blockWidth ; i++){
-            for(int j = 0 ; j < blockHight ; j++){
+        for(int i = 0; i < blockWidth && i < imageWidth; i++){
+            for(int j = 0 ; j < blockHight && j < imageHight; j++){
                 /*
-                  _ _ _ _ _
-                 |         |
-                 |  *   *  |
-                 |         |
-                 |  *   *  |
-                 |_ _ _ _ _|
-                 */
+                _ _ _ _ _
+                |         |
+                |  *   *  |
+                |         |
+                |  *   *  |
+                |_ _ _ _ _|
+                */
                 distance += Math.abs((pixelsArray[(i%blockWidth)+(blockWidth*widthStep)][(j%blockHight)+(blockHight*hightStep)])-(codeBook[codeBookIndex][i][j]));
                 //pixelsArray[(i%blockWidth)+(blockWidth*widthStep)][(j%blockHight)+(blockHight*hightStep)]
             }
         }
         return distance;
     } 
-    private double[][] LGBAlgorithm(int[][] pixelsArray,int imageHight , int imageWidth ,int blockWidth , int blockHight , int codeBookSize){
+//_________________________________________________________________________________________________________________________________________________
+    private double[][][] LGBAlgorithm(int[][] pixelsArray,int imageHight , int imageWidth ,int blockWidth , int blockHight , int codeBookSize){
         this.imageHight = imageHight;
         this.imageWidth = imageWidth;
         this.blockHight = blockHight;
@@ -45,7 +59,9 @@ class VectorQuantization{
         this.codeBookSize = codeBookSize;
         double[][][] codeBook = new double[1][blockWidth][blockHight];
         double[][] initialBlock = new double[blockWidth][blockHight];
-        //1-calculate the average
+        //------------------------
+        //1-create initial block
+        //------------------------
         for(int i = 0; i < imageWidth ; i++){
             for(int j = 0 ; j < imageHight ; j++){
                 initialBlock[i%blockWidth][j%blockHight] += pixelsArray[i][j];
@@ -60,63 +76,80 @@ class VectorQuantization{
                 codeBook[0][i][j] = initialBlock[i][j];
             }
         }
-        //2-split
+        //----------------------------
+        //2-create remaining blocks
+        //----------------------------
         this.numberOfBlocksInCodeBook = 1;
         int widthStep;
         int hightStep;
-        int maxNumberOfWidthSteps;
-        int maxNumberOfhightSteps;
+        int maxNumberOfWidthSteps = imageWidth/blockWidth;
+        int maxNumberOfHightSteps = imageHight/blockHight;
         while (numberOfBlocksInCodeBook < codeBookSize) {
+            //------------
+            //2.1-split
+            //------------
             codeBook = split(codeBook);
             numberOfBlocksInCodeBook *=2;
+            //---------------------------------
+            //2.2-set blocks to codeBookBlocks
+            //---------------------------------
             double [][][] averageArray = new double[numberOfBlocksInCodeBook][blockWidth][blockHight];
-            int[]  frequancy = new int[numberOfBlocksInCodeBook];
-            for(int i = 1 ; i < numberOfBlocksInCodeBook ; i++){
-                frequancy[i] = 0;
-            }
-            //3-compare all blocks
+            double[]  frequency = new double[numberOfBlocksInCodeBook];
             widthStep = 0;
             hightStep = 0;
-            maxNumberOfWidthSteps = imageWidth/blockWidth;
-            maxNumberOfhightSteps = imageHight/blockHight;
-            while (widthStep <= maxNumberOfWidthSteps) {
-                while (hightStep <= maxNumberOfhightSteps) {
+            while (widthStep < maxNumberOfWidthSteps) {
+                //System.out.println(widthStep);
+                hightStep = 0;
+                while (hightStep < maxNumberOfHightSteps) {
                     /* 
-                       _ _ _
-                      |_|   |
-                      |     |
-                      |_ _ _|
+                     _ _ _
+                    |_|   |
+                    |     |
+                    |_ _ _|
                     */
-                    double[] blockDistances = new double[numberOfBlocksInCodeBook] ;
+                    //2.2.1-calculate min distance
+                    double minDistance=0;
+                    int minBlockDistanceIndex = 0;
                     for(int i = 0 ; i < numberOfBlocksInCodeBook ; i++ ){
-                        blockDistances[i] = distance(pixelsArray,widthStep,hightStep,codeBook,i);
-                        
-                    }
-                   double minDistance = blockDistances[0];
-                   int minBlockDistanceIndex = 0;
-                   for(int i = 1 ; i < numberOfBlocksInCodeBook ; i++){
-                        if(blockDistances[i] < minBlockDistanceIndex){
-                            minDistance = blockDistances[i];
+                        double distance = distance(pixelsArray,widthStep,hightStep,codeBook,i);
+                        if(i == 0){
+                            minDistance = distance;
+                        }
+                        else if(distance < minDistance){
+                            minDistance = distance;
                             minBlockDistanceIndex = i;
                         }
                     }
+                    //2.2.2-add this block to average array
                     for(int i = 0; i < blockWidth ; i++){
                         for(int j = 0 ; j < blockHight ; j++){
-                           averageArray[minBlockDistanceIndex][i][j]=pixelsArray[(i%blockWidth)+(blockWidth*widthStep)][(j%blockHight)+(blockHight*hightStep)] ;
+                            averageArray[minBlockDistanceIndex][i][j] +=pixelsArray[(i%blockWidth)+(blockWidth*widthStep)][(j%blockHight)+(blockHight*hightStep)] ;
                         }
                     }
-                    frequancy[minBlockDistanceIndex]++;
-                    hightStep += blockHight;
+                    frequency[minBlockDistanceIndex]++;
+                   // System.out.println("//////////////////////////////////////////////////////////////");
+                    hightStep ++;
                 }
-                widthStep +=blockWidth;
+                widthStep ++;
             }
             for(int n = 0 ; n < this.numberOfBlocksInCodeBook ; n++){
                 for(int i = 0 ; i < this.blockWidth ; i++){
                     for(int j = 0 ; j < this.blockHight ; j++){
-                        averageArray[n][i][j] /= frequancy[n];
+                        averageArray[n][i][j] /= frequency[n];
                     }
                 }
             }
+            // for(int n = 0 ; n < this.numberOfBlocksInCodeBook ; n++){
+            //     for(int i = 0 ; i < this.blockWidth ; i++){
+            //         for(int j = 0 ; j < this.blockHight ; j++){
+            //             System.out.print(codeBook[n][i][j]+" ");
+            //         }
+            //         System.out.println();
+            //         System.out.println();
+            //     }
+            //     System.out.println("_____________________________________________");
+            // }
+            codeBook = averageArray;
         }
         // for(int n = 0 ; n < this.numberOfBlocksInCodeBook ; n++){
         //     for(int i = 0 ; i < this.blockWidth ; i++){
@@ -128,7 +161,7 @@ class VectorQuantization{
         //     }
         //     System.out.println("++++++++++++++++++++++++++++++++++++++++++");
         // }
-        return initialBlock;
+        return codeBook;
 
     }
     public void compress(BufferedImage image,int blockWidth , int blockHight , int codeBookSize ){
@@ -143,12 +176,15 @@ class VectorQuantization{
                 pixelsArray[i][j] = (image.getRGB(i,j) >> 16) & 0xFF;
             }
         }
-        double [][] arr = LGBAlgorithm(pixelsArray,height,width, blockWidth, blockHight, codeBookSize);
-        for (int i = 0; i < blockWidth; i++) {
-            for (int j = 0; j < blockHight; j++) {
-                System.out.print(arr[i][j]+" ");
+        double [][][] arr = LGBAlgorithm(pixelsArray,height,width, blockWidth, blockHight, codeBookSize);
+        for (int n = 0; n < codeBookSize; n++) {
+            for (int i = 0; i < blockWidth; i++) {
+                for (int j = 0; j < blockHight; j++) {
+                    System.out.print(arr[n][i][j]+" ");
+                }
+                System.out.println();
             }
-            System.out.println();
+            System.out.println("----------------------");
         }
     }
     public void decompress(){
