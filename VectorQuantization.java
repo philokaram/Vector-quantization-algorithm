@@ -13,7 +13,7 @@ class VectorQuantization{
         for(int n = 0 ; n < this.numberOfBlocksInCodeBook ; n++){
             for(int i = 0 ; i < this.blockWidth ; i++){
                 for(int j = 0 ; j < this.blockHight ; j++){
-                    newCodeBook[(2*n)+1][i][j] = Math.floor(oldCodeBook[n][i][j]);
+                    newCodeBook[(2*n)+1][i][j] = Math.ceil(oldCodeBook[n][i][j])+1;
                     newCodeBook[2*n][i][j] = Math.ceil(oldCodeBook[n][i][j]);
                 }
             }
