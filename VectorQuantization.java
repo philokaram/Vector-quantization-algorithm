@@ -1,4 +1,3 @@
-import java.awt.image.BufferedImage;
 
 class VectorQuantization{
     private int imageHight;
@@ -7,6 +6,7 @@ class VectorQuantization{
     private int blockWidth;
     private int codeBookSize;
     private int numberOfBlocksInCodeBook = 0;
+    private double[][][] codeBook;
 //_______________________________________________________________________________________________________________________
     private double[][][] split(double[][][] oldCodeBook){
         double[][][] newCodeBook = new double[numberOfBlocksInCodeBook*2][blockWidth][blockHight];
@@ -212,20 +212,20 @@ class VectorQuantization{
         return codeBook;
 
     }
-    public int[][] compress(BufferedImage image,int blockWidth , int blockHight , int codeBookSize ){
-        //-----------------------------------------------------
-        //1-take the pixels of image and put it in 2d array
-        //-----------------------------------------------------
-        int width = image.getWidth();
-        int height = image.getHeight();
-        int[][] pixelsArray = new int[width][height];
-        System.out.println(height+" "+width);
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-                // System.out.println(i+" "+j);
-                pixelsArray[i][j] = (image.getRGB(i,j) >> 16) & 0xFF;
-            }
-        }
+    public int[][] compress(int[][] pixelsArray ,int imageWidth, int imageHight,int blockWidth , int blockHight , int codeBookSize ){
+        // //-----------------------------------------------------
+        // //1-take the pixels of image and put it in 2d array
+        // //-----------------------------------------------------
+        // int width = image.getWidth();
+        // int height = image.getHeight();
+        // int[][] pixelsArray = new int[width][height];
+        // System.out.println(height+" "+width);
+        // for (int i = 0; i < width; i++) {
+        //     for (int j = 0; j < height; j++) {
+        //         // System.out.println(i+" "+j);
+        //         pixelsArray[i][j] = (image.getRGB(i,j) >> 16) & 0xFF;
+        //     }
+        // }
         // int[][] temp ={{1,2,7,9,4,11},{3,4,6,6,12,12},{4,9,15,14,9,9},{10,10,20,18,8,8},{4,3,17,16,1,4},{4,5,18,18,5,6}};
         // for (int i = 0; i < 6; i++) {
         //     for (int j = 0; j < 6; j++) {
@@ -237,7 +237,7 @@ class VectorQuantization{
         //-------------------------
         //2-create the code book
         //-------------------------
-        double [][][] codeBook = LGBAlgorithm(pixelsArray,height,width, blockWidth, blockHight, codeBookSize);
+        codeBook = LGBAlgorithm(pixelsArray,imageHight,imageWidth, blockWidth, blockHight, codeBookSize);
         // for (int n = 0; n < codeBookSize; n++) {
         //     for (int i = 0; i < blockWidth; i++) {
         //         for (int j = 0; j < blockHight; j++) {
@@ -300,5 +300,13 @@ class VectorQuantization{
     }
     public void setBlockWidth(int blockWidth) {
         this.blockWidth = blockWidth;
+    }
+
+    public double[][][] getCodeBook() {
+        return codeBook;
+    }
+
+    public void setCodeBook(double[][][] codeBook) {
+        this.codeBook = codeBook;
     }
 }
