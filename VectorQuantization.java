@@ -13,8 +13,14 @@ class VectorQuantization{
         for(int n = 0 ; n < this.numberOfBlocksInCodeBook ; n++){
             for(int i = 0 ; i < this.blockWidth ; i++){
                 for(int j = 0 ; j < this.blockHight ; j++){
-                    newCodeBook[(2*n)+1][i][j] = Math.ceil(oldCodeBook[n][i][j])+1;
-                    newCodeBook[2*n][i][j] = Math.ceil(oldCodeBook[n][i][j]);
+                    if(Math.floor(oldCodeBook[n][i][j]) == oldCodeBook[n][i][j] ){
+                        newCodeBook[2*n][i][j] = oldCodeBook[n][i][j] - 1;
+                        newCodeBook[(2*n)+1][i][j] = oldCodeBook[n][i][j] +1;
+                    }
+                    else{
+                        newCodeBook[2*n][i][j] = Math.floor(oldCodeBook[n][i][j]);
+                        newCodeBook[(2*n)+1][i][j] = Math.ceil(oldCodeBook[n][i][j]);
+                    }
                 }
             }
         }
@@ -64,8 +70,8 @@ class VectorQuantization{
         //------------------------
         for(int i = 0; i < imageWidth ; i++){
             for(int j = 0 ; j < imageHight ; j++){
-                initialBlock[i%blockWidth][j%blockHight] += pixelsArray[i][j];
                 // System.out.println(i%blockWidth + " "+ j%blockHight + " "+ i + " "+ j + " "+arr[i][j]);
+                initialBlock[i%blockWidth][j%blockHight] += pixelsArray[i][j];
             }
         }
         double blocksNumber = (imageHight*imageWidth)/(blockHight*blockWidth);
@@ -219,7 +225,9 @@ class VectorQuantization{
                 pixelsArray[i][j] = (image.getRGB(i,j) >> 16) & 0xFF;
             }
         }
-        double [][][] arr = LGBAlgorithm(pixelsArray,height,width, blockWidth, blockHight, codeBookSize);
+        int[][] temp ={{1,2,7,9,4,11},{3,4,6,6,12,12},{4,9,15,14,9,9},{10,10,20,18,8,8},{4,3,17,16,1,4},{4,5,18,18,5,6}};
+        double [][][] arr = LGBAlgorithm(temp,6,6, blockWidth, blockHight, codeBookSize);
+        //double [][][] arr = LGBAlgorithm(pixelsArray,height,width, blockWidth, blockHight, codeBookSize);
         for (int n = 0; n < codeBookSize; n++) {
             for (int i = 0; i < blockWidth; i++) {
                 for (int j = 0; j < blockHight; j++) {
