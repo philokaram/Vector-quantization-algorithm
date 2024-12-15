@@ -1,7 +1,7 @@
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Scanner;
-import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 
 class Main{
@@ -35,7 +35,7 @@ class Main{
                     File imageFile = new File(imagePath);
                     try {
                         BufferedImage image = ImageIO.read(imageFile);
-                        vectorQuantization.compress(image, blockWidth, blockHight, codeBookSize);
+                        int[][] compressedMatrix = vectorQuantization.compress(image, blockWidth, blockHight, codeBookSize);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

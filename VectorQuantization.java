@@ -103,7 +103,6 @@ class VectorQuantization{
             double [][][] averageArray = new double[numberOfBlocksInCodeBook][blockWidth][blockHight];
             frequency = new double[numberOfBlocksInCodeBook];
             widthStep = 0;
-            hightStep = 0;
             while (widthStep < maxNumberOfWidthSteps) {
                 //System.out.println(widthStep);
                 hightStep = 0;
@@ -213,8 +212,10 @@ class VectorQuantization{
         return codeBook;
 
     }
-    public void compress(BufferedImage image,int blockWidth , int blockHight , int codeBookSize ){
+    public int[][] compress(BufferedImage image,int blockWidth , int blockHight , int codeBookSize ){
+        //-----------------------------------------------------
         //1-take the pixels of image and put it in 2d array
+        //-----------------------------------------------------
         int width = image.getWidth();
         int height = image.getHeight();
         int[][] pixelsArray = new int[width][height];
@@ -225,18 +226,65 @@ class VectorQuantization{
                 pixelsArray[i][j] = (image.getRGB(i,j) >> 16) & 0xFF;
             }
         }
-        int[][] temp ={{1,2,7,9,4,11},{3,4,6,6,12,12},{4,9,15,14,9,9},{10,10,20,18,8,8},{4,3,17,16,1,4},{4,5,18,18,5,6}};
-        double [][][] arr = LGBAlgorithm(temp,6,6, blockWidth, blockHight, codeBookSize);
-        //double [][][] arr = LGBAlgorithm(pixelsArray,height,width, blockWidth, blockHight, codeBookSize);
-        for (int n = 0; n < codeBookSize; n++) {
-            for (int i = 0; i < blockWidth; i++) {
-                for (int j = 0; j < blockHight; j++) {
-                    System.out.print(arr[n][i][j]+" ");
+        // int[][] temp ={{1,2,7,9,4,11},{3,4,6,6,12,12},{4,9,15,14,9,9},{10,10,20,18,8,8},{4,3,17,16,1,4},{4,5,18,18,5,6}};
+        // for (int i = 0; i < 6; i++) {
+        //     for (int j = 0; j < 6; j++) {
+        //         System.out.print(temp[i][j]+" ");
+        //     }
+        //     System.out.println();
+        // }
+        // double [][][] codeBook = LGBAlgorithm(temp,6,6, blockWidth, blockHight, codeBookSize);
+        //-------------------------
+        //2-create the code book
+        //-------------------------
+        double [][][] codeBook = LGBAlgorithm(pixelsArray,height,width, blockWidth, blockHight, codeBookSize);
+        // for (int n = 0; n < codeBookSize; n++) {
+        //     for (int i = 0; i < blockWidth; i++) {
+        //         for (int j = 0; j < blockHight; j++) {
+        //             System.out.print(codeBook[n][i][j]+" ");
+        //         }
+        //         System.out.println();
+        //     }
+        //     System.out.println("----------------------");
+        // }
+        //-------------------------
+        //2-create the compressed matrix 
+        //-------------------------
+        int[][] compressedMatrix = new int[imageWidth/blockWidth][imageHight/blockHight];
+        int widthStep = 0;
+        int hightStep;
+        int maxNumberOfWidthSteps = imageWidth/blockWidth;
+        int maxNumberOfHightSteps = imageHight/blockHight;
+        while (widthStep < maxNumberOfWidthSteps) {
+            hightStep = 0;
+            while (hightStep < maxNumberOfHightSteps) {
+                /* 
+                 _ _ _
+                |_|   |
+                |     |
+                |_ _ _|
+                */
+                //2.2.1-calculate min distance
+                double minDistance=0;
+                int minBlockDistanceIndex = 0;
+                for(int i = 0 ; i < numberOfBlocksInCodeBook ; i++ ){
+                    double distance = distance(pixelsArray,widthStep,hightStep,codeBook,i);
+                    // double distance = distance(temp,widthStep,hightStep,codeBook,i);
+                    if(i == 0){
+                        minDistance = distance;
+                    }
+                    else if(distance < minDistance){
+                        minDistance = distance;
+                        minBlockDistanceIndex = i;
+                    }
                 }
-                System.out.println();
+                compressedMatrix[widthStep][hightStep] = minBlockDistanceIndex;
+                System.out.println(minBlockDistanceIndex);
+                hightStep++;
             }
-            System.out.println("----------------------");
+            widthStep++;
         }
+        return  compressedMatrix;
     }
     public void decompress(){
 
