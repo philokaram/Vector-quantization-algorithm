@@ -266,7 +266,7 @@ class VectorQuantization{
                 //2.2.1-calculate min distance
                 double minDistance=0;
                 int minBlockDistanceIndex = 0;
-                for(int i = 0 ; i < numberOfBlocksInCodeBook ; i++ ){
+                for(int i = 0 ; i < codeBookSize ; i++ ){
                     double distance = distance(pixelsArray,widthStep,hightStep,codeBook,i);
                     // double distance = distance(temp,widthStep,hightStep,codeBook,i);
                     if(i == 0){
@@ -294,6 +294,7 @@ class VectorQuantization{
             for (int hightStep = 0; hightStep < compressedMatrix[0].length; hightStep++) {
                 // Get the index of the codebook for the current block
                 int codeBookIndex = compressedMatrix[widthStep][hightStep];
+                System.out.println(codeBookIndex);
 
                 // Fill the corresponding block in the decompressed image using the codebook
                 for (int i = 0; i < blockWidth; i++) {
