@@ -61,6 +61,31 @@ class Main{
 
                 }
                 case 2 -> {
+                    System.out.print("Enter the compressed file name: ");
+                    compressedFileName = input.next();
+                    int[][] compressedMatrix = vectorQuantization.readCompressedDataFromTxtFile(compressedFileName);
+                    double[][][] codeBook = vectorQuantization.getCodeBook();
+                    int imageWidth = vectorQuantization.getImageWidth();
+                    int imageHeight = vectorQuantization.getImageHeight();
+                    int blockWidth = vectorQuantization.getBlockWidth();
+                    int blockHight = vectorQuantization.getBlockHight();
+                    int codeBookSize = vectorQuantization.getCodeBookSize();
+                    int[][] decompressedMatrix = vectorQuantization.decompress(compressedMatrix, codeBook, imageWidth, imageHeight, blockWidth, blockHight);
+                    BufferedImage decompressedImage = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_RGB);
+                    for (int i = 0; i < imageWidth; i++) {
+                        for (int j = 0; j < imageHeight; j++) {
+                            int pixel = decompressedMatrix[i][j];
+                            int rgb = (pixel << 16) | (pixel << 8) | pixel;
+                            decompressedImage.setRGB(i, j, rgb);
+                        }
+                    }
+                    try {
+                        File outputImage = new File("decompressedImage.jpg");
+                        ImageIO.write(decompressedImage, "jpg", outputImage);
+                        System.out.println("The Decompression Done.");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
                 case 0 -> isRunning = false;
                 default -> System.out.println("invalid option, Please try again.");
