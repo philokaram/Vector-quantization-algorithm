@@ -62,7 +62,7 @@ public class IOOperation {
             System.out.println(blockWidth);
             blockHight =input.nextInt();
             System.out.println(blockHight);
-            codeBookSize = input.nextInt()-1;
+            codeBookSize = input.nextInt();
             System.out.println(codeBookSize);
             int compressedMatrixWidth = imageWidth/blockWidth;
             int compressedMatrixHight = imageHight/blockHight;
