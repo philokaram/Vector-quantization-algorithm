@@ -285,9 +285,9 @@ class VectorQuantization{
         }
         return  compressedMatrix;
     }
-    public void decompress(int[][] compressedMatrix, int imageWidth, int imageHight) {
+    public double[][] decompress(int[][] compressedMatrix,double[][][] codeBook, int imageWidth, int imageHight,int blockWidth , int blockHight) {
         // Create a 2D array to hold the decompressed image
-        int[][] decompressedImage = new int[imageWidth][imageHight];
+        double[][] decompressedImage = new double[imageWidth][imageHight];
 
         // Iterate through each block in the compressed matrix
         for (int widthStep = 0; widthStep < compressedMatrix.length; widthStep++) {
@@ -311,7 +311,7 @@ class VectorQuantization{
                 }
             }
         }
-
+        return decompressedImage;
     }
     public void setImageHight(int imageHight) {
         this.imageHight = imageHight;

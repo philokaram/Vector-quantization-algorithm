@@ -1,6 +1,5 @@
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
 import javax.imageio.ImageIO;
@@ -20,6 +19,7 @@ class Main{
         int codeBookSize;
         Scanner input = new Scanner(System.in);
         VectorQuantization vectorQuantization = new VectorQuantization();
+        IOOperation ioOperation = new IOOperation();
         while(isRunning){
             menu();
             choice = input.nextInt();
@@ -53,7 +53,7 @@ class Main{
                         int[][] compressedMatrix = vectorQuantization.compress(pixelsArray,imageWidth, imageHeight,blockWidth, blockHight, codeBookSize);
                         System.out.print("Enter a name for compressed file: ");
                         compressedFileName = input.next();
-                        writeCompressedDataInTxtFile(compressedMatrix,vectorQuantization.getCodeBook(),compressedFileName,imageWidth,imageHeight,blockWidth,blockHight,codeBookSize);
+                        ioOperation.writeCompressedDataInTxtFile(compressedMatrix,vectorQuantization.getCodeBook(),compressedFileName,imageWidth,imageHeight,blockWidth,blockHight,codeBookSize);
                         System.out.println("The Compression Done.");
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -63,18 +63,18 @@ class Main{
                 case 2 -> {
                     System.out.print("Enter the compressed file name: ");
                     compressedFileName = input.next();
-                    int[][] compressedMatrix = vectorQuantization.readCompressedDataFromTxtFile(compressedFileName);
+                    int[][] compressedMatrix = ioOperation.readCompressedDataFromTxtFile(compressedFileName);
                     double[][][] codeBook = vectorQuantization.getCodeBook();
-                    int imageWidth = vectorQuantization.getImageWidth();
-                    int imageHeight = vectorQuantization.getImageHeight();
-                    int blockWidth = vectorQuantization.getBlockWidth();
-                    int blockHight = vectorQuantization.getBlockHight();
-                    int codeBookSize = vectorQuantization.getCodeBookSize();
-                    int[][] decompressedMatrix = vectorQuantization.decompress(compressedMatrix, codeBook, imageWidth, imageHeight, blockWidth, blockHight);
+                    int imageWidth = ioOperation.getImageWidth();
+                    int imageHeight = ioOperation.getImageHight();
+                    blockWidth = ioOperation.getBlockWidth();
+                    blockHight = ioOperation.getBlockHight();
+                    codeBookSize = ioOperation.getCodeBookSize();
+                    double[][] decompressedMatrix = vectorQuantization.decompress(compressedMatrix, codeBook, imageWidth, imageHeight, blockWidth, blockHight);
                     BufferedImage decompressedImage = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_RGB);
                     for (int i = 0; i < imageWidth; i++) {
                         for (int j = 0; j < imageHeight; j++) {
-                            int pixel = decompressedMatrix[i][j];
+                            int pixel =(int) decompressedMatrix[i][j];
                             int rgb = (pixel << 16) | (pixel << 8) | pixel;
                             decompressedImage.setRGB(i, j, rgb);
                         }
@@ -102,37 +102,5 @@ class Main{
         System.out.print("Enter your choice: ");
 
     }
-    public static void writeCompressedDataInTxtFile(int[][] compressedMatrix ,double[][][] codeBook , String compressedFileName ,int imageWidth,int imageHight,int blockWidth ,int blockHight ,int codeBookSize){
-        try {
-            FileWriter outputFile = new FileWriter(compressedFileName);
-            outputFile.write(Integer.toString(imageWidth));
-            outputFile.write(' ');
-            outputFile.write(Integer.toString(imageHight));
-            outputFile.write(' ');
-            outputFile.write(Integer.toString(blockWidth));
-            outputFile.write(' ');
-            outputFile.write(Integer.toString(blockHight));
-            outputFile.write(' ');
-            outputFile.write(Integer.toString(codeBookSize));
-            outputFile.write('\n');
-            int compressedMatrixWidth = imageWidth/blockWidth;
-            int compressedMatrixHight = imageHight/blockHight;
-            for (int i = 0; i < compressedMatrixWidth; i++) {
-                for (int j = 0; j <compressedMatrixHight ; j++) {
-                    outputFile.write(Integer.toString(compressedMatrix[i][j]) +' ');
-                }
-                
-            }
-            for (int n = 0; n < codeBookSize; n++) {
-                for (int i = 0; i < blockWidth; i++) {
-                    for (int j = 0; j < blockHight; j++) {
-                        outputFile.write(Double.toString(codeBook[n][i][j])+" ");
-                    }
-                }
-                outputFile.write('\n');
-            }
-        } catch (IOException ex) {
-        }
-
-    }
+    
 }
