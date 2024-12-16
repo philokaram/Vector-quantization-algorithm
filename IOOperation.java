@@ -54,35 +54,35 @@ public class IOOperation {
         try {
             File outputFile = new File(compressedFileName);
             Scanner input = new Scanner(outputFile);
-            imageWidth = input.nextInt();
+            this.imageWidth = input.nextInt();
             System.out.println(imageWidth);
-            imageHight = input.nextInt();
+            this.imageHight = input.nextInt();
             System.out.println(imageHight);
-            blockWidth =input.nextInt();
+            this.blockWidth =input.nextInt();
             System.out.println(blockWidth);
-            blockHight =input.nextInt();
+            this.blockHight =input.nextInt();
             System.out.println(blockHight);
-            codeBookSize = input.nextInt();
+            this.codeBookSize = input.nextInt();
             System.out.println(codeBookSize);
             int compressedMatrixWidth = imageWidth/blockWidth;
             int compressedMatrixHight = imageHight/blockHight;
-            compressedMatrix = new int[compressedMatrixWidth][compressedMatrixHight];
+            this.compressedMatrix = new int[compressedMatrixWidth][compressedMatrixHight];
             for (int i = 0; i < compressedMatrixWidth; i++) {
                 for (int j = 0; j <compressedMatrixHight ; j++) {
                     int x =input.nextInt(); 
                     System.out.println(x);
-                    // compressedMatrix[i][j] =input.nextInt();
+                    compressedMatrix[i][j] = x;
                 }
                 
             }
 
-            codeBook = new double[codeBookSize][blockWidth][blockHight];
+            this.codeBook = new double[codeBookSize][blockWidth][blockHight];
             for (int n = 0; n < codeBookSize; n++) {
                 for (int i = 0; i < blockWidth; i++) {
                     for (int j = 0; j < blockHight; j++) {
                         double x =Double.parseDouble(input.next()); 
-                    System.out.println(n+" "+i+" "+j+" "+x);
-                        // codeBook[n][i][j] = Double.parseDouble(input.next());
+                        System.out.println(n+" "+i+" "+j+" "+x);
+                        codeBook[n][i][j] =x;
                     }
                 }
                 System.out.println("---------------------------------------------------------------------");

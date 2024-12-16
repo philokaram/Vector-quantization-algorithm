@@ -64,7 +64,7 @@ class Main{
                     System.out.print("Enter the compressed file name: ");
                     compressedFileName = input.next();
                     int[][] compressedMatrix = ioOperation.readCompressedDataFromTxtFile(compressedFileName);
-                    double[][][] codeBook = vectorQuantization.getCodeBook();
+                    double[][][] codeBook = ioOperation.getCodeBook();
                     int imageWidth = ioOperation.getImageWidth();
                     int imageHeight = ioOperation.getImageHight();
                     blockWidth = ioOperation.getBlockWidth();

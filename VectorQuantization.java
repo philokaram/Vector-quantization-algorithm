@@ -305,6 +305,7 @@ class VectorQuantization{
                         // Ensure we do not go out of bounds
                         if (x < imageWidth && y < imageHight) {
                             // Set the pixel value from the codebook
+                            System.out.println(x + " " + y + " " + i + " " + j +" "+codeBook[codeBookIndex][i][j]);
                             decompressedImage[x][y] = (int) codeBook[codeBookIndex][i][j];
                         }
                     }
