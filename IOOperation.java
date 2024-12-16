@@ -29,21 +29,23 @@ public class IOOperation {
             int compressedMatrixHight = imageHight/blockHight;
             for (int i = 0; i < compressedMatrixWidth; i++) {
                 for (int j = 0; j <compressedMatrixHight ; j++) {
-                    outputFile.write(Integer.toString(compressedMatrix[i][j]) +' ');
+                    outputFile.write(Integer.toString(compressedMatrix[i][j]) +" ");
                 }
-                
             }
             outputFile.write('\n');
             for (int n = 0; n < codeBookSize; n++) {
                 for (int i = 0; i < blockWidth; i++) {
                     for (int j = 0; j < blockHight; j++) {
-                        outputFile.write(Double.toString(codeBook[n][i][j])+' ');
-                        System.out.println(n+" "+i+" "+j+" "+Double.toString(codeBook[n][i][j]));
+                        String x = Double.toString(codeBook[n][i][j]);
+                        outputFile.write(x);
+                        outputFile.write(" ");
+                        System.out.println(n+" "+i+" "+j+" "+x);
 
                     }
                 }
                 outputFile.write('\n');
             }
+            outputFile.close();
         } catch (IOException ex) {
         }
     }
@@ -60,7 +62,7 @@ public class IOOperation {
             System.out.println(blockWidth);
             blockHight =input.nextInt();
             System.out.println(blockHight);
-            codeBookSize = input.nextInt();
+            codeBookSize = input.nextInt()-1;
             System.out.println(codeBookSize);
             int compressedMatrixWidth = imageWidth/blockWidth;
             int compressedMatrixHight = imageHight/blockHight;
@@ -85,6 +87,7 @@ public class IOOperation {
                 }
                 System.out.println("---------------------------------------------------------------------");
             }
+            input.close();
         } catch (IOException ex) {
         }
         return compressedMatrix ;
